@@ -1,0 +1,121 @@
+[tool.poetry]
+name = "nafld"
+version = "0.0.1"
+description = "Non-alcoholic fatty liver disorder diagnosis improvement system"
+authors = ["Jakub Płudowski <jakub.m.pludowski@gmail.com>"]
+packages = [{from = "src" }]
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+
+[tool.poetry.dev-dependencies]
+ruff = "^0.1.9"
+mkdocs = "^1.5.3"
+mkdocs-material = "^9.5.2"
+ipykernel = "^6.27.1"
+pre-commit = "^3.6.0"
+pytest = "^7.4.3"
+
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+line-length = 120
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+
+extend-select = [
+    "A",     # flake8-builtins
+    "B",     # flake8-bugbear
+    "C",     # flake8-comprehensions
+    "COM",   # flake8-commas
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "I",     # isort
+    "W",     # pycodestyle warnings
+    "ASYNC", # flake8-async
+    "C4",    # flake8-comprehensions
+    "T10",   # flake8-debugger
+    "T20",   # flake8-print
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "ARG",   # flake8-unused-arguments
+    "ERA",   # eradicate
+    "PGH",   # pygrep-hooks
+    "PL",    # pylint
+    "RUF",   # ruff-specific
+    "UP",    # pyupgrade
+    "ANN",   # flake8-annotations
+    "S",     # flake8-bandit
+    "BLE",   # flake8-blind-except
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "PIE",   # flake8-pie
+    "PT",    # flake8-pytest-style
+    "PTH",   # flake8-use-pathlib
+    "TD",    # flake8-todos
+]
+ignore = [
+    "ANN101",  # missing self typehint
+    "ANN102",  # missing cls typehint
+    "ANN204",  # missing typehint from class
+    "PLR0913", 
+
+    
+    "COM812",
+    "ISC001",
+    "TD002",
+    "TD003",
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["S101", "ANN201"]
+

@@ -1,0 +1,23 @@
+[flake8]
+max-line-length = 100
+max-complexity = 10
+
+ignore =
+    # Conflicts with Black:
+    # E203: whitespace before ':'
+    # E501: line too long
+    # W503: line break before binary operator
+    E203, E266, E501, W503
+    # D10X: missing docstring in public methods
+    D100, D101, D102, D103, D104, D105, D106, D107
+
+exclude =
+    .git,
+    __pycache__,
+    .mypy_cache,
+    build,
+    dist,
+    env,
+    .env,
+    venv,
+    .venv,

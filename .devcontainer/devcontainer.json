@@ -1,0 +1,101 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.163.1/containers/python-3
+{
+	"name": "NAFLD",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "..",
+		"args": {
+			// Update 'VARIANT' to pick a Python version: 3, 3.6, 3.7, 3.8, 3.9
+			"VARIANT": "3.9"
+		}
+	},
+	"runArgs": [
+		"--env-file",
+		".env"
+	],
+	"customizations": {
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"autoDocstring.includeExtendedSummary": true,
+				"python.testing.pytestArgs": [
+					"tests"
+				],
+				"python.testing.unittestEnabled": false,
+				"python.testing.nosetestsEnabled": false,
+				"python.testing.pytestEnabled": true,
+				"files.exclude": {
+					".mypy_cache": true,
+					"**/__pycache__": true
+				},
+				"git.autofetch": true,
+				"git.fetchOnPull": true,
+				"files.insertFinalNewline": true,
+				"files.trimFinalNewlines": true,
+				"java.home": "/docker-java-home",
+				"python.analysis.extraPaths": [
+					"src"
+				],
+				"python.autoComplete.extraPaths": [
+					"src"
+				],
+				"python.terminal.activateEnvInCurrentTerminal": true,
+				"jupyter.notebookFileRoot": "src",
+				"jupyter.interactiveWindow.textEditor.executeSelection": true,
+				"python.languageServer": "Pylance",
+				"isort.args": [
+					"--settings-path=./pyproject.toml"
+				],
+				"isort.check": true,
+				"isort.importStrategy": "fromEnvironment",
+				"python.venvFolders": [
+					".cache/pypoetry/virtualenvs"
+				],
+				"[python]": {
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll": true,
+						"source.organizeImports": true
+					},
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				},
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true
+				},
+				"[markdown]": {
+					"editor.wordWrap": "bounded",
+					"editor.wordWrapColumn": 120
+				}
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-python.python",
+				"ms-toolsai.jupyter",
+				"paiqo.databricks-vscode",
+				"brainfit.vscode-importmagic",
+				"ms-python.vscode-pylance",
+				"njpwerner.autodocstring",
+				"formulahendry.azure-storage-explorer",
+				"ms-toolsai.vscode-ai",
+				"redhat.vscode-yaml",
+				"mutantdino.resourcemonitor",
+				"ms-azure-devops.azure-pipelines",
+				"tamasfe.even-better-toml",
+				"streetsidesoftware.code-spell-checker",
+				"donjayamanne.githistory",
+				"mhutchie.git-graph",
+				"gruntfuggly.todo-tree",
+				"janisdd.vscode-edit-csv",
+				"charliermarsh.ruff"
+			]
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bash -l .devcontainer/init.sh",
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}
