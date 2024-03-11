@@ -1,4 +1,4 @@
-from nafld.utils.get_config import ConfigBase, get_config
+from nafld.utils.base_config import ConfigBase, get_config
 
 
 def initialize_environment() -> tuple[ConfigBase]:

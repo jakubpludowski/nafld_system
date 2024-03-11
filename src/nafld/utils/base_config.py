@@ -11,26 +11,29 @@ class ConfigBase:
     ORIGINAL_DATA_CSV_FILE = "data/data_original/data_complete.csv"
 
     FEATURES_PARQUET = "data.parquet"
+    FEATURES_CSV = "data.csv"
 
 
 class DevConfig(ConfigBase):
     def __init__(self, mode: str) -> None:
         self.MODE = mode
 
-        dir_name = "data/dev/"
-        self.DATA_PROCESSED_DIRECTORY = dir_name + self.DATA_PROCESSED_DIRECTORY
-        self.DATA_RAW_DIRECTORY = dir_name + self.DATA_RAW_DIRECTORY
-        self.RAW_FEATURES_TABLE_PARQUET = self.DATA_RAW_DIRECTORY + self.FEATURES_PARQUET
+        data_dir_name = "data/dev/"
+        self.DATA_PROCESSED_DIRECTORY = data_dir_name + self.DATA_PROCESSED_DIRECTORY
+        self.DATA_RAW_DIRECTORY = data_dir_name + self.DATA_RAW_DIRECTORY
+        self.RAW_FEATURES_TABLE_PARQUET = self.DATA_RAW_DIRECTORY + self.FEATURES_CSV
+        self.BASE_FEATURES_TABLE_PARQUET = self.DATA_PROCESSED_DIRECTORY + self.FEATURES_PARQUET
 
 
 class ProdConfig(ConfigBase):
     def __init__(self, mode: str) -> None:
         self.MODE = mode
 
-        dir_name = "data/prod/"
-        self.DATA_PROCESSED_DIRECTORY = dir_name + self.DATA_PROCESSED_DIRECTORY
-        self.DATA_RAW_DIRECTORY = dir_name + self.DATA_RAW_DIRECTORY
-        self.RAW_FEATURES_TABLE_PARQUET = dir_name + self.DATA_RAW_DIRECTORY + self.FEATURES_PARQUET
+        data_dir_name = "data/prod/"
+        self.DATA_PROCESSED_DIRECTORY = data_dir_name + self.DATA_PROCESSED_DIRECTORY
+        self.DATA_RAW_DIRECTORY = data_dir_name + self.DATA_RAW_DIRECTORY
+        self.RAW_FEATURES_TABLE_PARQUET = data_dir_name + self.DATA_RAW_DIRECTORY + self.FEATURES_CSV
+        self.BASE_FEATURES_TABLE_PARQUET = self.DATA_PROCESSED_DIRECTORY + self.FEATURES_PARQUET
 
 
 CONFIG_ENVS = {"dev": DevConfig, "prod": ProdConfig}
