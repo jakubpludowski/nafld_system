@@ -4,17 +4,25 @@ from pandas import DataFrame
 
 
 class StaticTable(AbstractTable):
-    def __init__(self, mode: str, data_level: str, name: str) -> None:
-        self.mode = mode
-        self.data_level = data_level
+    def __init__(self, name: str, path_to_table: str) -> None:
         self.name = name
+        self.path = path_to_table
 
-    def read(self, file_path: str, file_format: str = "parquet") -> DataFrame:
+    def read(self, file_format: str = "parquet") -> DataFrame:
         if file_format == "parquet":
-            df = pd.read_parquet(file_path)
+            try:
+                df = pd.read_parquet(self.path)
+            except FileNotFoundError:
+                return None
         elif file_format == "csv":
-            df = pd.read_csv(file_path)
+            try:
+                df = pd.read_csv(self.path)
+            except FileNotFoundError:
+                return None
         return df
 
-    def write_parquet(self, df: DataFrame, path: str) -> DataFrame:
-        df.to_parquet(path)
+    def write_parquet(self, df: DataFrame) -> None:
+        df.to_parquet(self.path)
+
+    def write_csv(self, df: DataFrame) -> None:
+        df.to_csv(self.path)

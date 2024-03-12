@@ -39,6 +39,7 @@ cd inputs
 mkdir new
 mkdir original
 mkdir patients
+mkdir processed
 cd ..
 cd ..
 cd test
@@ -50,6 +51,7 @@ cd inputs
 mkdir new
 mkdir original
 mkdir patients
+mkdir processed
 cd ..
 cd ..
 cd prod
@@ -61,3 +63,4 @@ cd inputs
 mkdir new
 mkdir original
 mkdir patients
+mkdir processed

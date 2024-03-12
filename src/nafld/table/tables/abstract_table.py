@@ -11,3 +11,7 @@ class AbstractTable(ABC):
     @abstractmethod
     def write_parquet(self) -> DataFrame:
         raise NotImplementedError
+
+    @abstractmethod
+    def write_csv(self) -> DataFrame:
+        raise NotImplementedError
