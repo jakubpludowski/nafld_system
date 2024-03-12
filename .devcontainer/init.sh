@@ -24,3 +24,40 @@ mkdir .vscode
 echo '{
     "python.pythonPath": '\"${PYTHON_PATH}\"'
 }' >  .vscode/settings.json
+
+cd data
+mkdir dev
+mkdir test
+mkdir prod
+
+cd dev
+mkdir raw
+mkdir base
+mkdir models
+mkdir inputs
+cd inputs
+mkdir new
+mkdir original
+mkdir patients
+cd ..
+cd ..
+cd test
+mkdir raw
+mkdir base
+mkdir models
+mkdir inputs
+cd inputs
+mkdir new
+mkdir original
+mkdir patients
+cd ..
+cd ..
+cd prod
+mkdir raw
+mkdir base
+mkdir models
+mkdir inputs
+cd inputs
+mkdir new
+mkdir original
+mkdir patients
