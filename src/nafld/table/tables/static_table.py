@@ -11,15 +11,21 @@ class StaticTable(AbstractTable):
     def read(self, file_format: str = "parquet") -> DataFrame:
         if file_format == "parquet":
             try:
-                df = pd.read_parquet(self.path)
+                return pd.read_parquet(self.path)
             except FileNotFoundError:
                 return None
         elif file_format == "csv":
             try:
-                df = pd.read_csv(self.path)
+                return pd.read_csv(self.path)
             except FileNotFoundError:
                 return None
-        return df
+        elif file_format == "excel":
+            try:
+                return pd.read_excel(self.path)
+            except FileNotFoundError:
+                return None
+        else:
+            raise ValueError("Wrong file format. It can only take files in parquet, csv or xlsx format.")
 
     def write_parquet(self, df: DataFrame) -> None:
         df.to_parquet(self.path)

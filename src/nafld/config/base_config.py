@@ -1,6 +1,6 @@
 from typing import Any
 
-from .argument_parsing import parse_arguments
+from nafld.utils.argument_parsing import parse_arguments
 
 
 class ConfigBase:
@@ -19,7 +19,7 @@ class ConfigBase:
     FEATURES_PARQUET = "data.parquet"
     FEATURES_CSV = "data.csv"
     INPUT_DATA_CSV = "data.csv"
-    INPUT_ORIGINAL_DATA_CSV = "data.csv"
+    INPUT_ORIGINAL_DATA_XLSX = "data_original.xlsx"
 
     def __init__(self, mode: str) -> None:
         data_dir_name = f"data/{mode}/"
@@ -38,7 +38,7 @@ class ConfigBase:
 
         # TODO: add models
 
-        self.INPUTS_ORIGINAL_DATA = self.DATA_INPUTS_ORIGINAL_DIRECTORY + self.INPUT_ORIGINAL_DATA_CSV
+        self.INPUTS_ORIGINAL_DATA = self.DATA_INPUTS_ORIGINAL_DIRECTORY + self.INPUT_ORIGINAL_DATA_XLSX
         self.INPUTS_NEW_DATA = self.DATA_INPUTS_NEW_DIRECTORY + self.INPUT_DATA_CSV
         self.INPUTS_PROCESSED_DATA = self.DATA_INPUTS_PROCESSED_DIRECTORY + self.INPUT_DATA_CSV
 
