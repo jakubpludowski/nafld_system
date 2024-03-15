@@ -5,6 +5,7 @@ from nafld.table.tables.static_table import StaticTable
 from pandas import DataFrame, get_dummies
 from runscripts.manage_data.configs.step_1_2_config import (
     AGE_UNTRUSTY,
+    COLNAMES_DICT_TO_TRANSLATE,
     COLUMN_NAMES_TO_DROP,
     COLUMNS_TO_FILL_WITH_VALUES_FROM_NORMAL_DISTRIBUTION,
     RANDOM_STATE_FOR_REGRESSION_MODELS,
@@ -34,7 +35,7 @@ class DataLoader:
     def process_data(self) -> None:
         df = self.load_data_from_table()
         df = self.delete_empty_rows_and_columns(df)
-        df = self.add_unique_id_for_clients(df)
+        df = self.add_unique_id_for_patients(df)
         df = self.drop_redundant_columns(df)
         df = self.manage_label(df)
         df = self.handle_sex_column(df)
@@ -45,6 +46,10 @@ class DataLoader:
         df = self.fill_feature_based_on_regression_model(df, "height", ["age", "weight"])
         df = self.handle_BMI(df)
 
+        df = self.deal_with_categorical_columns(df)
+
+        df = df.rename(columns=COLNAMES_DICT_TO_TRANSLATE)
+
         self.save_table(df)
 
     def delete_empty_rows_and_columns(self, df: DataFrame) -> DataFrame:
@@ -52,9 +57,9 @@ class DataLoader:
         df = df.dropna(axis=1, how="all")
         return df.reset_index().drop(columns=["L,p", "index"])
 
-    def add_unique_id_for_clients(self, df: DataFrame) -> DataFrame:
+    def add_unique_id_for_patients(self, df: DataFrame) -> DataFrame:
         unique_ids = [uuid.uuid4() for _ in range(len(df))]
-        df["ClientId"] = unique_ids
+        df["PatientId"] = unique_ids
         return df
 
     def drop_redundant_columns(self, df: DataFrame) -> DataFrame:
@@ -142,6 +147,21 @@ class DataLoader:
     def handle_sex_column(self, df: DataFrame) -> DataFrame:
         df.loc[df["sex"] != "D", ["sex"]] = "C"
         df["sex"] = get_dummies(df["sex"], drop_first=True)
+
+        return df
+
+    def deal_with_categorical_columns(self, df: DataFrame) -> DataFrame:
+        df.loc[df["bilirubina"] == "<1,0", ["bilirubina"]] = 0.5
+        df.loc[df["bilirubina"] == "< 1,0", ["bilirubina"]] = 0.5
+        df.loc[df["bilirubina"].isnull(), ["bilirubina"]] = 1
+        df["bilirubina"] = df["bilirubina"].apply(float)
+
+        df.loc[df["bil. bezpośrednia "] == "<1,0", ["bil. bezpośrednia "]] = 0.5
+        df.loc[df["bil. bezpośrednia "] == "< 1,0", ["bil. bezpośrednia "]] = 0.5
+        df.loc[df["bil. bezpośrednia "].isnull(), ["bil. bezpośrednia "]] = 1
+        df["bil. bezpośrednia "] = df["bil. bezpośrednia "].apply(float)
+
+        return df
 
 
 def binarize_label(old_label: str, binary: bool = True) -> None:
