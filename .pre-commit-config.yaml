@@ -17,27 +17,20 @@ repos:
         exclude: ".*\\.md"
       - id: check-merge-conflict
       - id: check-yaml
+        exclude: mkdocs.yml # This file won't pass the check due to the "format" value of mermaid custom_fences in mkdocs.yml
       - id: check-toml
 
   - repo: local
     hooks:
-      - id: isort
-        name: isort
-        entry: poetry run isort
+      - id: ruff
+        name: ruff
+        entry: poetry run ruff check
         types:
           - python
         language: system
-
-      - id: black
-        name: black
-        entry: poetry run black
-        types:
-          - python
-        language: system
-
-      - id: flake8
-        name: flake8
-        entry: poetry run flake8
+      - id: ruff-format
+        name: ruff-format
+        entry: poetry run ruff format
         types:
           - python
         language: system
