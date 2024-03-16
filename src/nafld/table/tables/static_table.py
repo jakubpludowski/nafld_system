@@ -31,4 +31,4 @@ class StaticTable(AbstractTable):
         df.to_parquet(self.path)
 
     def write_csv(self, df: DataFrame) -> None:
-        df.to_csv(self.path)
+        df.to_csv(self.path, index=False)

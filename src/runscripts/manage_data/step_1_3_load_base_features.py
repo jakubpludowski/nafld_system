@@ -12,5 +12,3 @@ if __name__ == "__main__":
 
     base_features_table = BaseFeaturesTable(base_features_table)
     base_features_table.generate(raw_features_table, raw_inputs_features_table, base_database_features_table)
-
-    # convert_csv_to_parquet(CONF.ORIGINAL_DATA_CSV_FILE, CONF.RAW_FEATURES_TABLE_PARQUET)  # noqa: ERA001
