@@ -1,11 +1,14 @@
+import copy
 import pickle
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nafld.models.configs.models_config import RANDOM_STATE, TEST_SIZE
+from nafld.models.configs.models_config import CV_FOR_RANDOM_SEARCH, N_ITER, RANDOM_STATE, TEST_SIZE
 from nafld.utils.model_utils.best_parameters_loader import save_best_parameters
 from pandas import DataFrame
 from sklearn.base import BaseEstimator
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import RandomizedSearchCV
 
 
 class AbstractModel(ABC):
@@ -52,9 +55,38 @@ class AbstractModel(ABC):
     def make_predictions(self, test_data_X: DataFrame) -> DataFrame:
         return self.model.predict(test_data_X)
 
-    @abstractmethod
-    def get_hyper_parameters() -> dict:
-        raise NotImplementedError
+    def get_hyper_parameters(self, data: tuple) -> dict:
+        (X_train, y_train, X_test, y_test) = data
+
+        # Check previous model accuracy
+        y_pred = self.make_predictions(X_test)
+        previous_model_score = accuracy_score(y_test, y_pred)
+
+        # Find new hyper parameters
+        param_dist = self.MODELS[self.name]["search_hyper_params"]
+        random_search = RandomizedSearchCV(
+            estimator=self.model,
+            param_distributions=param_dist,
+            n_iter=N_ITER,
+            cv=CV_FOR_RANDOM_SEARCH,
+            random_state=RANDOM_STATE,
+        )
+        random_search.fit(X_train, y_train)
+        best_params = random_search.best_params_
+
+        # Check new model accuracy
+        model_with_new_params = copy.deepcopy(self.model).set_params(**best_params)
+        model_with_new_params.fit(X_train, y_train)
+        y_pred = model_with_new_params.predict(X_test)
+        new_model_score = accuracy_score(y_test, y_pred)
+
+        # Decide if new hyper parameters should replace old ones
+        if new_model_score >= previous_model_score:
+            self.MODELS[self.name]["best_hyper_params"] = best_params
+        else:
+            self.MODELS[self.name]["best_hyper_params"] = self.model.get_params()
+        self.save_new_best_parameters(self.MODELS)
+        return self.MODELS[self.name]["best_hyper_params"]
 
     @abstractmethod
     def create_new_model() -> BaseEstimator:
