@@ -40,6 +40,8 @@ class ConfigBase:
         self.INPUTS_NEW_DATA = self.DATA_INPUTS_NEW_DIRECTORY + self.INPUT_DATA_CSV
         self.INPUTS_PROCESSED_DATA = self.DATA_INPUTS_PROCESSED_DIRECTORY + self.INPUT_DATA_CSV
 
+        self.PATH_TO_BEST_PARAMETERS = self.DATA_MODELS_DIRECTORY + "best_params.json"
+
 
 class DevConfig(ConfigBase):
     def __init__(self, mode: str) -> None:

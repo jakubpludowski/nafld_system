@@ -4,7 +4,7 @@ from nafld.utils.initialize_environment import initialize_environment
 from runscripts.manage_data.configs.step_1_2_config import SEED
 
 if __name__ == "__main__":
-    CONF = initialize_environment()
+    CONF, GLOBAL_MODELS = initialize_environment()
 
     input_original_features_table = StaticTable(name="original_features", path_to_table=CONF.INPUTS_ORIGINAL_DATA)
     output_raw_features_table = StaticTable(name="raw_features", path_to_table=CONF.INPUTS_PROCESSED_DATA)
