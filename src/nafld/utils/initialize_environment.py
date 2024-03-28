@@ -1,5 +1,5 @@
 from nafld.config.base_config import ConfigBase, get_config
-from nafld.models.configs.models_config import MODELS
+from nafld.models.configs.hyper_parameter_config import MODELS
 from nafld.utils.model_utils.best_parameters_loader import load_best_parameters
 
 
