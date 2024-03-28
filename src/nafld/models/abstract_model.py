@@ -86,7 +86,6 @@ class AbstractModel(ABC):
         else:
             self.MODELS[self.name]["best_hyper_params"] = self.model.get_params()
         self.save_new_best_parameters(self.MODELS)
-        return self.MODELS[self.name]["best_hyper_params"]
 
     @abstractmethod
     def create_new_model() -> BaseEstimator:
