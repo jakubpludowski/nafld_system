@@ -1,0 +1,93 @@
+import copy
+import pickle
+from abc import ABC, abstractmethod
+from pathlib import Path
+
+from nafld.models.configs.models_config import CV_FOR_RANDOM_SEARCH, N_ITER, RANDOM_STATE, TEST_SIZE
+from nafld.utils.model_utils.best_parameters_loader import save_best_parameters
+from pandas import DataFrame
+from sklearn.base import BaseEstimator
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import RandomizedSearchCV
+
+
+class AbstractModel(ABC):
+    model: BaseEstimator
+
+    def __init__(self, name: str, global_models: dict, path_to_models: str, path_to_best_params: str) -> None:
+        self.name = name
+        self.folder_name = path_to_models
+        self.MODELS = global_models
+        self.path = Path(path_to_models) / (self.name + ".pkl")
+        self.path_to_best_parameters = path_to_best_params
+        self.random_state = RANDOM_STATE
+        self.test_size = TEST_SIZE
+
+    def load_model_from_file(self) -> None:
+        with Path.open(Path(self.path), "rb") as file:
+            self.model = pickle.load(file)  # noqa: S301
+
+    def save_to_file(self) -> None:
+        with Path.open(Path(self.path), "wb") as file:
+            pickle.dump(self.model, file)
+
+    def check_if_model_is_saved(self) -> bool:
+        file_name = Path(self.path).name
+        folder_contents = [entry.name for entry in Path(self.folder_name).iterdir() if entry.is_file()]
+        return file_name in folder_contents
+
+    def load_model(self, warm_start: bool) -> None:
+        if warm_start:
+            if self.check_if_model_is_saved():
+                self.load_model_from_file()
+            else:
+                self.create_new_model()
+        else:
+            self.create_new_model()
+
+    def save_new_best_parameters(self, model_dict: dict) -> None:
+        save_best_parameters(self.path_to_best_parameters, model_dict)
+
+    def train_model(self, data: tuple) -> None:
+        (X_train, y_train, _, _) = data
+        self.model.fit(X_train, y_train)
+
+    def make_predictions(self, test_data_X: DataFrame) -> DataFrame:
+        return self.model.predict(test_data_X)
+
+    def get_hyper_parameters(self, data: tuple) -> dict:
+        (X_train, y_train, X_test, y_test) = data
+
+        # Check previous model accuracy
+        y_pred = self.make_predictions(X_test)
+        previous_model_score = accuracy_score(y_test, y_pred)
+
+        # Find new hyper parameters
+        param_dist = self.MODELS[self.name]["search_hyper_params"]
+        random_search = RandomizedSearchCV(
+            estimator=self.model,
+            param_distributions=param_dist,
+            n_iter=N_ITER,
+            cv=CV_FOR_RANDOM_SEARCH,
+            random_state=RANDOM_STATE,
+        )
+        random_search.fit(X_train, y_train)
+        best_params = random_search.best_params_
+
+        # Check new model accuracy
+        model_with_new_params = copy.deepcopy(self.model).set_params(**best_params)
+        model_with_new_params.fit(X_train, y_train)
+        y_pred = model_with_new_params.predict(X_test)
+        new_model_score = accuracy_score(y_test, y_pred)
+
+        # Decide if new hyper parameters should replace old ones
+        if new_model_score >= previous_model_score:
+            self.MODELS[self.name]["best_hyper_params"] = best_params
+        else:
+            self.MODELS[self.name]["best_hyper_params"] = self.model.get_params()
+        self.save_new_best_parameters(self.MODELS)
+        return self.MODELS[self.name]["best_hyper_params"]
+
+    @abstractmethod
+    def create_new_model() -> BaseEstimator:
+        raise NotImplementedError
