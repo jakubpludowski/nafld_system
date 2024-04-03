@@ -1,6 +1,12 @@
 import pandas as pd
 from nafld.models.data_preparation import prepare_data
-from nafld.system.model_funcionality import load_all_models, set_model_to_warm_start, train_all_models
+from nafld.system.model_funcionality import (
+    load_all_models,
+    overwrite_models,
+    set_model_to_warm_start,
+    train_all_models,
+    validate_all_models,
+)
 from nafld.table.tables.static_table import StaticTable
 from nafld.utils.initialize_environment import initialize_environment
 from runscripts.manage_data.configs.step_1_4_config import MODELS_OBJECTS, MODELS_TO_TRAIN
@@ -25,11 +31,15 @@ if __name__ == "__main__":
 
     # Load estimators from files
     run_details, all_models = load_all_models(run_details, preprocessed_data, all_models, CONF)
+    if CONF.new_data:
+        # Set warm start depending on local config
+        all_models = set_model_to_warm_start(all_models)
 
-    # Set warm start depending on local config
-    all_models = set_model_to_warm_start(all_models)
+        # Set warm start depending on local config
+        all_models = train_all_models(all_models, preprocessed_data)
 
-    # Set warm start depending on local config
-    all_models = train_all_models(all_models, preprocessed_data)
+        # Validate all new trained models, assign new f1 metric.
+        run_details, all_models = validate_all_models(run_details, all_models, preprocessed_data)
 
-    # Validate all new trained models, assign new f1 metric. if new f1 is better than previous save new model
+        # If new f1 is better than previous save new model
+        overwrite_models(run_details, all_models)

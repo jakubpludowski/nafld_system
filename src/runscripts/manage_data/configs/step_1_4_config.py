@@ -9,9 +9,8 @@ from nafld.models.all_models import (
     XGBoostModel,
 )
 
-MODELS_TO_TRAIN = ["adaboost", "decision_tree", "knn"]
-# MODELS_TO_TRAIN = ["random_forest", "decision_tree",
-# "knn", "log_reg", "svm", "adaboost", "mlp", "xgb"]
+# MODELS_TO_TRAIN = ["adaboost", "decision_tree", "knn"]  # noqa: ERA001
+MODELS_TO_TRAIN = ["random_forest", "decision_tree", "knn", "log_reg", "svm", "adaboost", "mlp", "xgb"]
 
 
 MODELS_OBJECTS = {

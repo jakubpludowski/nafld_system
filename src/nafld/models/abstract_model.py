@@ -7,7 +7,16 @@ from nafld.models.configs.models_config import CV_FOR_RANDOM_SEARCH, N_ITER, RAN
 from nafld.utils.model_utils.best_parameters_loader import save_best_parameters
 from pandas import DataFrame
 from sklearn.base import BaseEstimator
-from sklearn.metrics import f1_score
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from sklearn.model_selection import RandomizedSearchCV
 
 
@@ -25,6 +34,7 @@ class AbstractModel(ABC):
         self.random_state = RANDOM_STATE
         self.test_size = TEST_SIZE
         self.warm_start = warm_start
+        self.f1 = 0
 
     def load_model_from_file(self) -> None:
         with Path.open(Path(self.path), "rb") as file:
@@ -53,6 +63,26 @@ class AbstractModel(ABC):
     def train_model(self, data: tuple) -> None:
         (X_train, y_train, _, _) = data
         self.model.fit(X_train, y_train)
+
+    def validate_model(self, data: tuple) -> None:
+        (_, _, X_test, y_test) = data
+        predictions = self.make_predictions(X_test)
+        acc = accuracy_score(y_test, predictions)
+        f1 = f1_score(y_test, predictions)
+        precision = precision_score(y_test, predictions)
+        recall = recall_score(y_test, predictions)
+        cm = confusion_matrix(y_test, predictions)
+        auc_roc = roc_auc_score(y_test, predictions).round(decimals=2)
+        pr, re, _ = precision_recall_curve(y_test, predictions)
+        auc_pr = auc(re, pr)
+
+        basic_stats = {"f1": f1, "accuracy": acc, "precision": precision, "recall": recall}
+
+        auc_values = {"roc_auc": auc_roc, "pr_auc": auc_pr, "confusion_matrix": cm}
+
+        predictions_and_y_test = {"predictions": predictions, "label": y_test}
+
+        return basic_stats, auc_values, predictions_and_y_test
 
     def make_predictions(self, test_data_X: DataFrame) -> DataFrame:
         return self.model.predict(test_data_X)

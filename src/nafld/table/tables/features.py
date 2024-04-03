@@ -1,7 +1,10 @@
+import uuid
+
 import pandas as pd
 from nafld.table.processed_table import ProcessedPatientFeaturesColumns
 from nafld.table.tables.base_table import BaseTable
 from nafld.table.tables.static_table import StaticTable
+from pandas import DataFrame
 
 
 class BaseFeaturesTable(BaseTable):
@@ -22,7 +25,13 @@ class BaseFeaturesTable(BaseTable):
                     raise ValueError(f"There are missing values in data {df.name}")
 
             features_base = pd.concat(data_to_concat, ignore_index=True)
-            features_base.drop_duplicates(subset=ProcessedPatientFeaturesColumns.PatiendId, inplace=True)
+
+            columns_to_drop_duplicates = ProcessedPatientFeaturesColumns.get_table_columns()
+            columns_to_drop_duplicates.remove(ProcessedPatientFeaturesColumns.PatiendId)
+
+            features_base.drop_duplicates(subset=columns_to_drop_duplicates, inplace=True)
+
+            features_base = self.add_unique_id_for_patients(features_base)
 
         else:
             raise ValueError("No data found")
@@ -31,3 +40,9 @@ class BaseFeaturesTable(BaseTable):
             self.table.write_parquet(df=features_base)
         else:
             raise ValueError("There are missing value in the final dataset")
+
+    def add_unique_id_for_patients(self, df: DataFrame) -> DataFrame:
+        unique_ids = [uuid.uuid4() for _ in range(len(df))]
+        df[ProcessedPatientFeaturesColumns.PatiendId] = unique_ids
+        df[ProcessedPatientFeaturesColumns.PatiendId] = df[ProcessedPatientFeaturesColumns.PatiendId].astype(str)
+        return df
