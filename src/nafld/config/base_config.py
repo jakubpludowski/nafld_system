@@ -22,7 +22,12 @@ class ConfigBase:
     INPUT_ORIGINAL_DATA_XLSX = "data_original.xlsx"
 
     def __init__(
-        self, mode: str, warm_start: bool = True, tune_hyperparams: bool = True, new_data: bool = False
+        self,
+        mode: str,
+        warm_start: bool = True,
+        tune_hyperparams: bool = True,
+        new_data: bool = False,
+        perform_shap_analysis: bool = False,
     ) -> None:
         # Paths
         data_dir_name = f"data/{mode}/"
@@ -49,6 +54,7 @@ class ConfigBase:
         self.warm_start = warm_start
         self.tune_hyperparams = tune_hyperparams
         self.new_data = new_data
+        self.perform_shap_analysis = perform_shap_analysis
 
 
 class DevConfig(ConfigBase):

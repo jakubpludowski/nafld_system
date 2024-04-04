@@ -1,6 +1,8 @@
+import pandas as pd
 from nafld.config.base_config import ConfigBase
 from nafld.models.abstract_model import AbstractModel
-from pandas import DataFrame
+from pandas import DataFrame, Series
+from sklearn.metrics import f1_score, roc_auc_score
 
 
 def load_all_models(
@@ -52,3 +54,25 @@ def overwrite_models(run_details: DataFrame, all_models: list[AbstractModel]) ->
             model.save_to_file()
 
     return run_details, all_models
+
+
+def test_ensemble_model(all_models: list[AbstractModel], data: DataFrame) -> float:
+    model_predictions = pd.DataFrame()
+    f1_metrics = []
+    (_, _, X_test, y_test) = data
+    for model in all_models:
+        preds = model.make_predictions(X_test)
+        model_predictions[f"{model.name}"] = preds
+        f1_metrics.append(f1_score(preds, y_test))
+
+    ensemble_preds = model_predictions.mean(axis=1)
+    return roc_auc_score(y_test, ensemble_preds), sum(f1_metrics) / len(f1_metrics)
+
+
+def predict_with_ensemble_model(all_models: list[AbstractModel], X_test: DataFrame) -> Series:
+    model_predictions = pd.DataFrame()
+    for model in all_models:
+        preds = model.make_predictions(X_test)
+        model_predictions[f"{model.name}"] = preds
+
+    return model_predictions.mean(axis=1)

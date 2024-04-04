@@ -7,7 +7,7 @@ from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import StratifiedShuffleSplit
 
 
-def prepare_data(data: DataFrame, pca: bool = True) -> DataFrame:
+def prepare_data(data: DataFrame, perform_shap_analysis: bool = False) -> DataFrame:
     data = data.drop(columns=(ProcessedPatientFeaturesColumns.PatiendId))
     X = data.drop(columns=[ProcessedPatientFeaturesColumns.Label])
     y = data[ProcessedPatientFeaturesColumns.Label]
@@ -22,7 +22,7 @@ def prepare_data(data: DataFrame, pca: bool = True) -> DataFrame:
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
-    if pca:
+    if not perform_shap_analysis:
         X_train, X_test = perform_PCA(data=(X_train, X_test))
 
     return (X_train, y_train, X_test, y_test)
