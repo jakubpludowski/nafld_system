@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from nafld.models.configs.models_config import PCA_THRESHOLD, RANDOM_STATE, TEST_SIZE
 from nafld.table.processed_table import ProcessedPatientFeaturesColumns
 from pandas import DataFrame
@@ -20,12 +21,18 @@ def prepare_data(data: DataFrame, perform_shap_analysis: bool = False) -> DataFr
 
     # Data standarization
     scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+    scaled_X_train = scaler.fit_transform(X_train)
+    scaled_X_test = scaler.transform(X_test)
+
+    X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns)
+    X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns)
     if not perform_shap_analysis:
         X_train, X_test = perform_PCA(data=(X_train, X_test))
+        X_train = pd.DataFrame(X_train)
+        X_test = pd.DataFrame(X_test)
+        return (X_train, y_train, X_test, y_test), None
 
-    return (X_train, y_train, X_test, y_test)
+    return (X_train, y_train, X_test, y_test), X.columns
 
 
 def perform_PCA(data: tuple[DataFrame, DataFrame]) -> tuple[DataFrame, DataFrame]:

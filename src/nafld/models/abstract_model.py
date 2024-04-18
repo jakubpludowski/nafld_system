@@ -60,9 +60,13 @@ class AbstractModel(ABC):
     def save_new_best_parameters(self, model_dict: dict) -> None:
         save_best_parameters(self.path_to_best_parameters, model_dict)
 
-    def train_model(self, data: tuple) -> None:
+    def train_model(self, data: tuple, feature_names: list[str]) -> None:
         (X_train, y_train, _, _) = data
-        self.model.fit(X_train, y_train)
+        if feature_names is None:
+            self.model.fit(X_train, y_train)
+        else:
+            self.model.fit(X_train, y_train)
+            self.model.feature_names = feature_names
 
     def validate_model(self, data: tuple) -> None:
         (_, _, X_test, y_test) = data

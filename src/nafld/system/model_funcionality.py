@@ -1,8 +1,9 @@
 import pandas as pd
 from nafld.config.base_config import ConfigBase
 from nafld.models.abstract_model import AbstractModel
-from pandas import DataFrame, Series
-from sklearn.metrics import f1_score, roc_auc_score
+from nafld.models.all_models.ensemble import EnsembleModel
+from pandas import DataFrame
+from sklearn.metrics import f1_score
 
 
 def load_all_models(
@@ -27,9 +28,9 @@ def set_model_to_warm_start(all_models: list[AbstractModel]) -> list[AbstractMod
     return all_models
 
 
-def train_all_models(all_models: list[AbstractModel], data: DataFrame) -> list[AbstractModel]:
+def train_all_models(all_models: list[AbstractModel], data: DataFrame, feature_names: list[str]) -> list[AbstractModel]:
     for model in all_models:
-        model.train_model(data)
+        model.train_model(data, feature_names)
 
     return all_models
 
@@ -56,23 +57,24 @@ def overwrite_models(run_details: DataFrame, all_models: list[AbstractModel]) ->
     return run_details, all_models
 
 
-def test_ensemble_model(all_models: list[AbstractModel], data: DataFrame) -> float:
+def test_ensemble_model(ensemble_model: EnsembleModel, all_models: list[AbstractModel], data: DataFrame) -> float:
     model_predictions = pd.DataFrame()
     f1_metrics = []
-    (_, _, X_test, y_test) = data
+    (X_train, y_train, X_test, y_test) = data
     for model in all_models:
         preds = model.make_predictions(X_test)
         model_predictions[f"{model.name}"] = preds
         f1_metrics.append(f1_score(preds, y_test))
 
-    ensemble_preds = model_predictions.mean(axis=1)
-    return roc_auc_score(y_test, ensemble_preds), sum(f1_metrics) / len(f1_metrics)
+    model_predictions["mean_preds"] = model_predictions.mean(axis=1)
 
+    models_to_ensemble = [(model.name, model.model) for model in all_models]
+    ensemble_model.create_new_model(models=models_to_ensemble)
+    ensemble_model.model.fit(X_train, y_train)
+    preds = ensemble_model.make_predictions(X_test)
+    ensemble_model.save_to_file()
+    model_predictions["ensemble"] = preds
 
-def predict_with_ensemble_model(all_models: list[AbstractModel], X_test: DataFrame) -> Series:
-    model_predictions = pd.DataFrame()
-    for model in all_models:
-        preds = model.make_predictions(X_test)
-        model_predictions[f"{model.name}"] = preds
+    model_predictions["label"] = y_test.reset_index(drop=True)
 
-    return model_predictions.mean(axis=1)
+    return model_predictions, sum(f1_metrics) / len(f1_metrics)

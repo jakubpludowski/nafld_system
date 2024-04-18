@@ -1,5 +1,7 @@
 import pandas as pd
+from nafld.models.all_models.ensemble import EnsembleModel
 from nafld.models.data_preparation import prepare_data
+from nafld.system.global_raport import generate_global_raport
 from nafld.system.model_funcionality import (
     load_all_models,
     overwrite_models,
@@ -17,10 +19,16 @@ if __name__ == "__main__":
 
     base_features_table = StaticTable(name="base_features", path_to_table=CONF.DATA_BASE)
 
-    preprocessed_data = prepare_data(base_features_table.read(), perform_shap_analysis=CONF.perform_shap_analysis)
+    preprocessed_data, feature_names = prepare_data(
+        base_features_table.read(), perform_shap_analysis=CONF.perform_shap_analysis
+    )
 
     run_details = []
     all_models = []
+
+    ensemble_model = EnsembleModel(
+        "ensemble", None, CONF.DATA_MODELS_DIRECTORY, CONF.PATH_TO_BEST_PARAMETERS, CONF.warm_start
+    )
 
     # Create all model objects
     for model_name in MODELS_TO_TRAIN:
@@ -40,7 +48,7 @@ if __name__ == "__main__":
         all_models = set_model_to_warm_start(all_models)
 
         # Set warm start depending on local config
-        all_models = train_all_models(all_models, preprocessed_data)
+        all_models = train_all_models(all_models, preprocessed_data, feature_names)
 
         # Validate all new trained models, assign new f1 metric.
         run_details, all_models = validate_all_models(run_details, all_models, preprocessed_data)
@@ -48,4 +56,6 @@ if __name__ == "__main__":
         # If new f1 is better than previous save new model
         overwrite_models(run_details, all_models)
 
-    test_ensemble_model(all_models, preprocessed_data)
+    results, mean_f1_result = test_ensemble_model(ensemble_model, all_models, preprocessed_data)
+
+    generate_global_raport(ensemble_model, preprocessed_data)
