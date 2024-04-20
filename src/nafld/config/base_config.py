@@ -17,6 +17,7 @@ class ConfigBase:
     ORIGINAL_DATA_CSV_FILE = "data/data_original/data_complete.csv"
 
     FEATURES_PARQUET = "data.parquet"
+    NEW_FEATURES_PARQUET = "new_data.parquet"
     FEATURES_CSV = "data.csv"
     INPUT_DATA_CSV = "data.csv"
     INPUT_ORIGINAL_DATA_XLSX = "data_original.xlsx"
@@ -42,6 +43,7 @@ class ConfigBase:
         self.DATA_INPUTS_PROCESSED_DIRECTORY = self.DATA_INPUTS_DIRECTORY + self.INPUTS_PROCESSED
 
         self.DATA_BASE = self.DATA_BASE_DIRECTORY + self.FEATURES_PARQUET
+        self.NEW_DATA_BASE = self.DATA_BASE_DIRECTORY + self.NEW_FEATURES_PARQUET
         self.DATA_RAW = self.DATA_RAW_DIRECTORY + self.FEATURES_CSV
 
         self.INPUTS_ORIGINAL_DATA = self.DATA_INPUTS_ORIGINAL_DIRECTORY + self.INPUT_ORIGINAL_DATA_XLSX

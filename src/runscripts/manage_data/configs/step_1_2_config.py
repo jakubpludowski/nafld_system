@@ -57,7 +57,7 @@ AGE_UNTRUSTY = 5
 WEIGHT_UNTRUSTY = 40
 
 COLNAMES_DICT_TO_TRANSLATE = {
-    "PatientId": ProcessedPatientFeaturesColumns.PatiendId,
+    "ID": ProcessedPatientFeaturesColumns.PatiendId,
     "label": ProcessedPatientFeaturesColumns.Label,
     "age": ProcessedPatientFeaturesColumns.Age,
     "sex": ProcessedPatientFeaturesColumns.Sex,

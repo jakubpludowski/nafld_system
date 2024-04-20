@@ -52,7 +52,7 @@ class DataLoader:
     def delete_empty_rows_and_columns(self, df: DataFrame) -> DataFrame:
         df = df.dropna(how="all")
         df = df.dropna(axis=1, how="all")
-        return df.reset_index().drop(columns=["L,p", "index"])
+        return df.reset_index().drop(columns=["index"])
 
     def drop_redundant_columns(self, df: DataFrame) -> DataFrame:
         return df.drop(columns=COLUMN_NAMES_TO_DROP)

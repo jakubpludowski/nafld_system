@@ -18,10 +18,16 @@ if __name__ == "__main__":
     CONF, MODELS_PARAMS = initialize_environment()
 
     base_features_table = StaticTable(name="base_features", path_to_table=CONF.DATA_BASE)
+    new_base_features_table = StaticTable(name="new_base_features", path_to_table=CONF.NEW_DATA_BASE)
 
-    preprocessed_data, feature_names = prepare_data(
-        base_features_table.read(), perform_shap_analysis=CONF.perform_shap_analysis
-    )
+    increment_data = new_base_features_table.read()
+    new_data = False
+    if increment_data is not None:
+        new_data = True
+        data_to_operate = increment_data
+    data_to_operate = base_features_table.read()
+
+    preprocessed_data, feature_names = prepare_data(data_to_operate, perform_shap_analysis=CONF.perform_shap_analysis)
 
     run_details = []
     all_models = []
@@ -43,7 +49,7 @@ if __name__ == "__main__":
 
     # Load estimators from files
     run_details, all_models = load_all_models(run_details, preprocessed_data, all_models, CONF)
-    if CONF.new_data:
+    if new_data:
         # Set warm start depending on local config
         all_models = set_model_to_warm_start(all_models)
 

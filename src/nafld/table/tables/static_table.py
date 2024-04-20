@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from nafld.table.tables.abstract_table import AbstractTable
 from pandas import DataFrame
@@ -32,3 +34,6 @@ class StaticTable(AbstractTable):
 
     def write_csv(self, df: DataFrame) -> None:
         df.to_csv(self.path, index=False)
+
+    def delete_file(self) -> None:
+        Path(self.path).unlink()
