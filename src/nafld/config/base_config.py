@@ -17,11 +17,20 @@ class ConfigBase:
     ORIGINAL_DATA_CSV_FILE = "data/data_original/data_complete.csv"
 
     FEATURES_PARQUET = "data.parquet"
+    NEW_FEATURES_PARQUET = "new_data.parquet"
     FEATURES_CSV = "data.csv"
     INPUT_DATA_CSV = "data.csv"
     INPUT_ORIGINAL_DATA_XLSX = "data_original.xlsx"
 
-    def __init__(self, mode: str) -> None:
+    def __init__(
+        self,
+        mode: str,
+        warm_start: bool = True,
+        tune_hyperparams: bool = True,
+        new_data: bool = False,
+        perform_shap_analysis: bool = False,
+    ) -> None:
+        # Paths
         data_dir_name = f"data/{mode}/"
         self.DATA_BASE_DIRECTORY = data_dir_name + self.DATA_BASE_DIRECTORY
         self.DATA_RAW_DIRECTORY = data_dir_name + self.DATA_RAW_DIRECTORY
@@ -34,6 +43,7 @@ class ConfigBase:
         self.DATA_INPUTS_PROCESSED_DIRECTORY = self.DATA_INPUTS_DIRECTORY + self.INPUTS_PROCESSED
 
         self.DATA_BASE = self.DATA_BASE_DIRECTORY + self.FEATURES_PARQUET
+        self.NEW_DATA_BASE = self.DATA_BASE_DIRECTORY + self.NEW_FEATURES_PARQUET
         self.DATA_RAW = self.DATA_RAW_DIRECTORY + self.FEATURES_CSV
 
         self.INPUTS_ORIGINAL_DATA = self.DATA_INPUTS_ORIGINAL_DIRECTORY + self.INPUT_ORIGINAL_DATA_XLSX
@@ -42,23 +52,29 @@ class ConfigBase:
 
         self.PATH_TO_BEST_PARAMETERS = self.DATA_MODELS_DIRECTORY + "best_params.json"
 
+        # Params from local config
+        self.warm_start = warm_start
+        self.tune_hyperparams = tune_hyperparams
+        self.new_data = new_data
+        self.perform_shap_analysis = perform_shap_analysis
+
 
 class DevConfig(ConfigBase):
-    def __init__(self, mode: str) -> None:
+    def __init__(self, mode: str, **kwargs: dict[str, Any]) -> None:
         self.MODE = mode
-        super().__init__(mode)
+        super().__init__(mode, **kwargs)
 
 
 class TestConfig(ConfigBase):
-    def __init__(self, mode: str) -> None:
+    def __init__(self, mode: str, **kwargs: dict[str, Any]) -> None:
         self.MODE = mode
-        super().__init__(mode)
+        super().__init__(mode, **kwargs)
 
 
 class ProdConfig(ConfigBase):
-    def __init__(self, mode: str) -> None:
+    def __init__(self, mode: str, **kwargs: dict[str, Any]) -> None:
         self.MODE = mode
-        super().__init__(mode)
+        super().__init__(mode, **kwargs)
 
 
 CONFIG_ENVS = {"dev": DevConfig, "prod": ProdConfig}

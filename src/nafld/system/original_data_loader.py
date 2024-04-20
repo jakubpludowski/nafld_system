@@ -1,5 +1,3 @@
-import uuid
-
 import numpy as np
 from nafld.table.tables.static_table import StaticTable
 from pandas import DataFrame, get_dummies
@@ -35,7 +33,6 @@ class DataLoader:
     def process_data(self) -> None:
         df = self.load_data_from_table()
         df = self.delete_empty_rows_and_columns(df)
-        df = self.add_unique_id_for_patients(df)
         df = self.drop_redundant_columns(df)
         df = self.manage_label(df)
         df = self.handle_sex_column(df)
@@ -55,12 +52,7 @@ class DataLoader:
     def delete_empty_rows_and_columns(self, df: DataFrame) -> DataFrame:
         df = df.dropna(how="all")
         df = df.dropna(axis=1, how="all")
-        return df.reset_index().drop(columns=["L,p", "index"])
-
-    def add_unique_id_for_patients(self, df: DataFrame) -> DataFrame:
-        unique_ids = [uuid.uuid4() for _ in range(len(df))]
-        df["PatientId"] = unique_ids
-        return df
+        return df.reset_index().drop(columns=["index"])
 
     def drop_redundant_columns(self, df: DataFrame) -> DataFrame:
         return df.drop(columns=COLUMN_NAMES_TO_DROP)
@@ -156,10 +148,10 @@ class DataLoader:
         df.loc[df["bilirubina"].isnull(), ["bilirubina"]] = 1
         df["bilirubina"] = df["bilirubina"].apply(float)
 
-        df.loc[df["bil. bezpośrednia "] == "<1,0", ["bil. bezpośrednia "]] = 0.5
-        df.loc[df["bil. bezpośrednia "] == "< 1,0", ["bil. bezpośrednia "]] = 0.5
-        df.loc[df["bil. bezpośrednia "].isnull(), ["bil. bezpośrednia "]] = 1
-        df["bil. bezpośrednia "] = df["bil. bezpośrednia "].apply(float)
+        df.loc[df["bil_bezpośrednia"] == "<1,0", ["bil_bezpośrednia"]] = 0.5
+        df.loc[df["bil_bezpośrednia"] == "< 1,0", ["bil_bezpośrednia"]] = 0.5
+        df.loc[df["bil_bezpośrednia"].isnull(), ["bil_bezpośrednia"]] = 1
+        df["bil_bezpośrednia"] = df["bil_bezpośrednia"].apply(float)
 
         return df
 
