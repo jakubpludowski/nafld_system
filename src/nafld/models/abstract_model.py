@@ -68,7 +68,7 @@ class AbstractModel(ABC):
             self.model.fit(X_train, y_train)
             self.model.feature_names = feature_names
 
-    def validate_model(self, data: tuple) -> None:
+    def validate_model(self, data: tuple) -> tuple[dict, dict, dict]:
         (_, _, X_test, y_test) = data
         predictions = self.make_predictions(X_test)
         acc = accuracy_score(y_test, predictions)
