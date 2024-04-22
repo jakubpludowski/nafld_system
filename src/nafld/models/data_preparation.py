@@ -1,3 +1,6 @@
+import pickle
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from nafld.models.configs.models_config import PCA_THRESHOLD, RANDOM_STATE, TEST_SIZE
@@ -8,7 +11,9 @@ from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import StratifiedShuffleSplit
 
 
-def prepare_data(data: DataFrame, perform_shap_analysis: bool = False) -> DataFrame:
+def prepare_data(
+    data: DataFrame, path_for_scaler: str, path_for_pca: str, perform_shap_analysis: bool = False
+) -> DataFrame:
     data = data.drop(columns=(ProcessedPatientFeaturesColumns.PatiendId))
     X = data.drop(columns=[ProcessedPatientFeaturesColumns.Label])
     y = data[ProcessedPatientFeaturesColumns.Label]
@@ -23,11 +28,13 @@ def prepare_data(data: DataFrame, perform_shap_analysis: bool = False) -> DataFr
     scaler = StandardScaler()
     scaled_X_train = scaler.fit_transform(X_train)
     scaled_X_test = scaler.transform(X_test)
+    with Path.open(Path(path_for_scaler), "wb") as file:
+        pickle.dump(obj=scaler, file=file)
 
     X_train = pd.DataFrame(scaled_X_train, columns=X_train.columns)
     X_test = pd.DataFrame(scaled_X_test, columns=X_test.columns)
     if not perform_shap_analysis:
-        X_train, X_test = perform_PCA(data=(X_train, X_test))
+        X_train, X_test = perform_PCA(data=(X_train, X_test), path_for_pca=path_for_pca)
         X_train = pd.DataFrame(X_train)
         X_test = pd.DataFrame(X_test)
         return (X_train, y_train, X_test, y_test), None
@@ -35,7 +42,7 @@ def prepare_data(data: DataFrame, perform_shap_analysis: bool = False) -> DataFr
     return (X_train, y_train, X_test, y_test), X.columns
 
 
-def perform_PCA(data: tuple[DataFrame, DataFrame]) -> tuple[DataFrame, DataFrame]:
+def perform_PCA(data: tuple[DataFrame, DataFrame], path_for_pca: str) -> tuple[DataFrame, DataFrame]:
     X_train, X_test = data
     if not X_train.shape[1] == X_test.shape[1]:
         raise ValueError("Nr of attributes in train and test set does not match")
@@ -51,5 +58,8 @@ def perform_PCA(data: tuple[DataFrame, DataFrame]) -> tuple[DataFrame, DataFrame
             break
 
     pca = PCA(n_components=nr_of_components)
+    pca.fit(X_train)
+    with Path.open(Path(path_for_pca), "wb") as file:
+        pickle.dump(obj=pca, file=file)
 
-    return pca.fit_transform(X_train), pca.transform(X_test)
+    return pca.transform(X_train), pca.transform(X_test)

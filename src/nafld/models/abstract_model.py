@@ -3,6 +3,7 @@ import pickle
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+import dalex as dx
 from nafld.models.configs.models_config import CV_FOR_RANDOM_SEARCH, N_ITER, RANDOM_STATE, TEST_SIZE
 from nafld.utils.model_utils.best_parameters_loader import save_best_parameters
 from pandas import DataFrame
@@ -125,6 +126,14 @@ class AbstractModel(ABC):
             self.model.warm_start = self.warm_start
         else:
             print(f"Model {self.name} does not provide warm start")  # noqa: T201
+
+    def perform_xai_analysis_for_single_model(self, data: tuple) -> None:
+        X_train, y_train = data
+        exp = dx.Explainer(self.model, X_train, y_train)
+        exp.model_performance(model_type="classification")
+        vi = exp.model_parts()
+        fig = vi.plot(max_vars=5, show=False)
+        fig.write_image(f"plots/plots_per_model/{self.name}_exp.png")
 
     @abstractmethod
     def create_new_model() -> BaseEstimator:

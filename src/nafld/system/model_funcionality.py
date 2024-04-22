@@ -1,3 +1,6 @@
+from pathlib import Path
+
+import dalex as dx
 import pandas as pd
 from nafld.config.base_config import ConfigBase
 from nafld.models.abstract_model import AbstractModel
@@ -73,15 +76,30 @@ def tidy_run_details(run_details: DataFrame) -> DataFrame:
 
 
 def test_ensemble_model(
-    run_details: DataFrame, ensemble_model: EnsembleModel, all_models: list[AbstractModel], data: DataFrame
+    run_details: DataFrame,
+    ensemble_model: EnsembleModel,
+    all_models: list[AbstractModel],
+    data: DataFrame,
+    path_to_explainer: str,
 ) -> float:
     model_predictions = pd.DataFrame()
     f1_metrics = []
+    feature_importances_per_model = {}
     (X_train, y_train, X_test, y_test) = data
     for model in all_models:
         preds = model.make_predictions(X_test)
         model_predictions[f"{model.name}"] = preds
         f1_metrics.append(f1_score(preds, y_test))
+        if hasattr(model.model, "feature_importances_"):
+            feature_importances = model.model.feature_importances_
+            df_importances = pd.DataFrame({"Feature": X_train.columns, "Importance": feature_importances})
+            df_importances["Importance"] = df_importances["Importance"].round(3)
+            df_importances_sorted = df_importances.sort_values(by="Importance", ascending=False)
+            feature_importances_per_model.update({model.name: df_importances_sorted[:5]})
+        else:
+            feature_importances_per_model.update({model.name: None})
+        if False:  # TODO: turn it on later
+            model.perform_xai_analysis_for_single_model((X_train, y_train))
 
     model_predictions["mean_preds"] = model_predictions.mean(axis=1)
 
@@ -98,7 +116,16 @@ def test_ensemble_model(
 
     basic_ensemble_stats, ensemble_auc_values, _ = ensemble_model.validate_model(data=data)
     ensemble_model.save_to_file()
+    exp = dx.Explainer(model.model, X_train, y_train)
+    with Path.open(Path(path_to_explainer), "wb") as fd:
+        exp.dump(fd)
     model_predictions["ensemble"] = preds
     model_predictions["label"] = y_test.reset_index(drop=True)
 
-    return model_predictions, basic_ensemble_stats, ensemble_auc_values, mean_f1_metric_for_all_models
+    return (
+        model_predictions,
+        basic_ensemble_stats,
+        ensemble_auc_values,
+        mean_f1_metric_for_all_models,
+        feature_importances_per_model,
+    )

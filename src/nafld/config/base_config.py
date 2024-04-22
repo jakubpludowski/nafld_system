@@ -51,6 +51,11 @@ class ConfigBase:
         self.INPUTS_PROCESSED_DATA = self.DATA_INPUTS_PROCESSED_DIRECTORY + self.INPUT_DATA_CSV
 
         self.PATH_TO_BEST_PARAMETERS = self.DATA_MODELS_DIRECTORY + "best_params.json"
+        self.PATH_TO_MODEL_EXPLAINER = self.DATA_MODELS_DIRECTORY + "exp.pkl"
+        self.PATH_TO_MODEL_PCA = self.DATA_MODELS_DIRECTORY + "pca.pkl"
+        self.PATH_TO_MODEL_SCALER = self.DATA_MODELS_DIRECTORY + "scaler.pkl"
+
+        self.PATH_TO_ALL_MODELS = self.DATA_MODELS_DIRECTORY + "all_models/"
 
         # Params from local config
         self.warm_start = warm_start
