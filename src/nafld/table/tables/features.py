@@ -28,6 +28,7 @@ class BaseFeaturesTable(BaseTable):
             features_base = pd.concat(data_to_concat, ignore_index=True)
 
             features_base.drop_duplicates(inplace=True)
+            features_base = self.add_unique_id_for_patients(features_base)
 
             base_features_increment_table = BaseFeaturesTable(new_base_features_table)
             if features_from_database is not None:
@@ -36,9 +37,6 @@ class BaseFeaturesTable(BaseTable):
                 base_features_increment_table.table.write_parquet(df=new_data)
             else:
                 base_features_increment_table.table.write_parquet(df=features_base)
-
-            features_base = self.add_unique_id_for_patients(features_base)
-
         else:
             raise ValueError("No data found")
 

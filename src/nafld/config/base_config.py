@@ -8,6 +8,7 @@ class ConfigBase:
     DATA_BASE_DIRECTORY = "base/"
     DATA_MODELS_DIRECTORY = "models/"
     DATA_INPUTS_DIRECTORY = "inputs/"
+    DATA_DIAGNOSIS = "diagnosis/"
 
     INPUTS_NEW_DIRECTORY = "new/"
     INPUTS_ORIGINAL_DIRECTORY = "original/"
@@ -27,7 +28,7 @@ class ConfigBase:
         mode: str,
         warm_start: bool = True,
         tune_hyperparams: bool = True,
-        new_data: bool = False,
+        wide_diagnosis: bool = False,
         perform_shap_analysis: bool = False,
     ) -> None:
         # Paths
@@ -36,6 +37,7 @@ class ConfigBase:
         self.DATA_RAW_DIRECTORY = data_dir_name + self.DATA_RAW_DIRECTORY
         self.DATA_MODELS_DIRECTORY = data_dir_name + self.DATA_MODELS_DIRECTORY
         self.DATA_INPUTS_DIRECTORY = data_dir_name + self.DATA_INPUTS_DIRECTORY
+        self.DATA_DIAGNOSIS_DIRECTORY = data_dir_name + self.DATA_DIAGNOSIS
 
         self.DATA_INPUTS_NEW_DIRECTORY = self.DATA_INPUTS_DIRECTORY + self.INPUTS_NEW_DIRECTORY
         self.DATA_INPUTS_ORIGINAL_DIRECTORY = self.DATA_INPUTS_DIRECTORY + self.INPUTS_ORIGINAL_DIRECTORY
@@ -51,11 +53,18 @@ class ConfigBase:
         self.INPUTS_PROCESSED_DATA = self.DATA_INPUTS_PROCESSED_DIRECTORY + self.INPUT_DATA_CSV
 
         self.PATH_TO_BEST_PARAMETERS = self.DATA_MODELS_DIRECTORY + "best_params.json"
+        self.PATH_TO_MODEL_EXPLAINER = self.DATA_MODELS_DIRECTORY + "exp.pkl"
+        self.PATH_TO_MODEL_PCA = self.DATA_MODELS_DIRECTORY + "pca.pkl"
+        self.PATH_TO_MODEL_SCALER = self.DATA_MODELS_DIRECTORY + "scaler.pkl"
+
+        self.PATH_TO_ALL_MODELS = self.DATA_MODELS_DIRECTORY + "all_models/"
+
+        self.PATIENTS_TO_DIAGNOSE_BASE = self.DATA_INPUTS_PATIENTS_DIRECTORY + "patients.parquet"
 
         # Params from local config
         self.warm_start = warm_start
         self.tune_hyperparams = tune_hyperparams
-        self.new_data = new_data
+        self.wide_diagnosis = wide_diagnosis
         self.perform_shap_analysis = perform_shap_analysis
 
 
