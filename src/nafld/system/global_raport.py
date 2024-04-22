@@ -44,7 +44,7 @@ def generate_global_raport(results: tuple, models_results: DataFrame, path_to_ex
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Raport z wykresami i tabelką</title>
+        <title>Raport jakości systemu</title>
         <style>
             table {{
                 border-collapse: collapse;
