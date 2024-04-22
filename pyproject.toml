@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nafld"
-version = "0.0.1"
+version = "0.0.5"
 description = "Non-alcoholic fatty liver disorder diagnosis improvement system"
 authors = ["Jakub Płudowski <jakub.m.pludowski@gmail.com>"]
 
